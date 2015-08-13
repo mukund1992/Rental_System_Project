@@ -22,18 +22,44 @@ CREATE DATABASE IF NOT EXISTS rentaldb;
 USE rentaldb;
 
 --
+-- Definition of table `accatalog`
+--
+
+DROP TABLE IF EXISTS `accatalog`;
+CREATE TABLE `accatalog` (
+  `prductId` int(11) NOT NULL AUTO_INCREMENT,
+  `brand` varchar(30) DEFAULT NULL,
+  `model` varchar(30) DEFAULT NULL,
+  `CapacityInTons` float DEFAULT NULL,
+  `Type` varchar(20) DEFAULT NULL,
+  `Voltage` int(11) DEFAULT NULL,
+  `Wattage` int(11) DEFAULT NULL,
+  `rentPerHour` double DEFAULT NULL,
+  `isAvailable` tinyint(1) DEFAULT NULL,
+  PRIMARY KEY (`prductId`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `accatalog`
+--
+
+/*!40000 ALTER TABLE `accatalog` DISABLE KEYS */;
+/*!40000 ALTER TABLE `accatalog` ENABLE KEYS */;
+
+
+--
 -- Definition of table `booking`
 --
 
 DROP TABLE IF EXISTS `booking`;
 CREATE TABLE `booking` (
-  `bookingID` int(11) NOT NULL,
+  `bookingID` int(11) NOT NULL AUTO_INCREMENT,
   `custId` int(11) NOT NULL,
   `catalogId` varchar(10) DEFAULT NULL,
   `productId` int(11) DEFAULT NULL,
-  `rentalBeginDate` date DEFAULT NULL,
-  `rentalEndDate` date DEFAULT NULL,
-  `bookingTimestamp` datetime DEFAULT NULL,
+  `expectedRentalBegin` datetime DEFAULT NULL,
+  `expectedRentalEnd` datetime DEFAULT NULL,
+  `bookingTimestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`bookingID`),
   KEY `custId` (`custId`),
   KEY `catalogId` (`catalogId`),
@@ -50,26 +76,68 @@ CREATE TABLE `booking` (
 
 
 --
+-- Definition of table `bookinghistory`
+--
+
+DROP TABLE IF EXISTS `bookinghistory`;
+CREATE TABLE `bookinghistory` (
+  `bookingID` int(11) NOT NULL,
+  `custId` int(11) NOT NULL,
+  `catalogId` varchar(10) DEFAULT NULL,
+  `productId` int(11) DEFAULT NULL,
+  `actualRentalBegin` datetime DEFAULT NULL,
+  `actualRentalEnd` datetime DEFAULT NULL,
+  `bookingTimestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `AmountPaid` double DEFAULT NULL,
+  PRIMARY KEY (`bookingID`),
+  KEY `custId` (`custId`),
+  KEY `catalogId` (`catalogId`),
+  CONSTRAINT `bookinghistory_ibfk_1` FOREIGN KEY (`custId`) REFERENCES `custinfo` (`custId`),
+  CONSTRAINT `bookinghistory_ibfk_2` FOREIGN KEY (`catalogId`) REFERENCES `cataloglist` (`catalogId`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `bookinghistory`
+--
+
+/*!40000 ALTER TABLE `bookinghistory` DISABLE KEYS */;
+/*!40000 ALTER TABLE `bookinghistory` ENABLE KEYS */;
+
+
+--
 -- Definition of table `carcatalog`
 --
 
 DROP TABLE IF EXISTS `carcatalog`;
 CREATE TABLE `carcatalog` (
-  `productId` int(11) NOT NULL,
+  `productId` int(11) NOT NULL AUTO_INCREMENT,
   `registrationNo` varchar(40) DEFAULT NULL,
   `rentPerHour` double DEFAULT NULL,
   `Capacity` int(11) DEFAULT NULL,
   `Model` varchar(20) DEFAULT NULL,
   `securityAmount` double DEFAULT NULL,
   `manufacturer` varchar(30) DEFAULT NULL,
-  PRIMARY KEY (`productId`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `isAvailable` tinyint(1) DEFAULT NULL,
+  PRIMARY KEY (`productId`),
+  UNIQUE KEY `registrationNo` (`registrationNo`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `carcatalog`
 --
 
 /*!40000 ALTER TABLE `carcatalog` DISABLE KEYS */;
+INSERT INTO `carcatalog` (`productId`,`registrationNo`,`rentPerHour`,`Capacity`,`Model`,`securityAmount`,`manufacturer`,`isAvailable`) VALUES 
+ (1,'100',2.5,4,'Swift Desire zxi',10000,'Maruti',1),
+ (2,'101',3.5,5,'Duster',15000,'chevrolet',1),
+ (3,'102',1,4,'nano',5000,'Tata',1),
+ (4,'103',4.5,7,'Innova zxi',20000,'toyata',1),
+ (5,'104',2,4,'Swift',10000,'Maruti',1),
+ (6,'105',3,4,'Indica',10000,'Tata',1),
+ (7,'106',2.2,4,'i-10',10000,'hundai',1),
+ (8,'107',2.5,4,'i-10 grand',12000,'hundai',1),
+ (9,'108',5.6,6,'mercedes c class',10000,'mercedes',1),
+ (10,'109',1.5,4,'audi',50000,'audi',1);
 /*!40000 ALTER TABLE `carcatalog` ENABLE KEYS */;
 
 
@@ -89,6 +157,9 @@ CREATE TABLE `cataloglist` (
 --
 
 /*!40000 ALTER TABLE `cataloglist` DISABLE KEYS */;
+INSERT INTO `cataloglist` (`catalogId`,`catalogName`) VALUES 
+ ('AC','ACCatalog'),
+ ('Cars','Carcatalog');
 /*!40000 ALTER TABLE `cataloglist` ENABLE KEYS */;
 
 
@@ -99,7 +170,7 @@ CREATE TABLE `cataloglist` (
 DROP TABLE IF EXISTS `custaddress`;
 CREATE TABLE `custaddress` (
   `custId` int(11) NOT NULL,
-  `addressId` int(11) NOT NULL,
+  `addressId` int(11) NOT NULL AUTO_INCREMENT,
   `street` varchar(50) DEFAULT NULL,
   `city` varchar(50) DEFAULT NULL,
   `state` varchar(50) DEFAULT NULL,
@@ -109,13 +180,28 @@ CREATE TABLE `custaddress` (
   PRIMARY KEY (`addressId`),
   KEY `custId` (`custId`),
   CONSTRAINT `custaddress_ibfk_1` FOREIGN KEY (`custId`) REFERENCES `custinfo` (`custId`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `custaddress`
 --
 
 /*!40000 ALTER TABLE `custaddress` DISABLE KEYS */;
+INSERT INTO `custaddress` (`custId`,`addressId`,`street`,`city`,`state`,`pincode`,`country`,`phoneNo`) VALUES 
+ (1,1,'street1','city1','state1',1111111,'country1','11111111'),
+ (1,2,'street2','city2','state2',2222222,'country2','22222222'),
+ (2,3,'street3','city3','state3',3333333,'country3','33333333'),
+ (2,4,'street4','city4','state4',4444444,'country4','44444444'),
+ (3,5,'street5','city5','state5',5555555,'country5','11111111'),
+ (3,6,'street6','city6','state6',6666666,'country6','77777777'),
+ (4,7,'street7','city7','state7',7777777,'country7','99999999'),
+ (4,8,'street8','city8','state8',9999999,'country8','11111222'),
+ (5,9,'street9','city9','state9',1111111,'country9','11111111'),
+ (6,10,'street10','city10','state10',1111111,'country10','11111222'),
+ (7,11,'street11','city11','state11',1111111,'country11','11666666'),
+ (8,12,'street12','city12','state12',1111111,'country12','11111111'),
+ (9,13,'street13','city13','state13',1111111,'country13','11111111'),
+ (10,14,'street14','city14','state14',1111111,'country14','11111111');
 /*!40000 ALTER TABLE `custaddress` ENABLE KEYS */;
 
 
@@ -125,7 +211,7 @@ CREATE TABLE `custaddress` (
 
 DROP TABLE IF EXISTS `custinfo`;
 CREATE TABLE `custinfo` (
-  `custId` int(11) NOT NULL,
+  `custId` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(20) DEFAULT NULL,
   `email` varchar(50) DEFAULT NULL,
   `password` varchar(30) DEFAULT NULL,
@@ -133,13 +219,24 @@ CREATE TABLE `custinfo` (
   `firstName` varchar(30) DEFAULT NULL,
   `lastName` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`custId`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `custinfo`
 --
 
 /*!40000 ALTER TABLE `custinfo` DISABLE KEYS */;
+INSERT INTO `custinfo` (`custId`,`username`,`email`,`password`,`DOB`,`firstName`,`lastName`) VALUES 
+ (1,'user1','user1@gmail.com','pswd1','1999-01-10','firstname1','lastname1'),
+ (2,'user2','user2@gmail.com','pswd2','2000-02-11','firstname2','lastname2'),
+ (3,'user3','user3@gmail.com','pswd3','2001-03-12','firstname3','lastname3'),
+ (4,'user4','user4@gmail.com','pswd4','2002-04-13','firstname4','lastname4'),
+ (5,'user5','user5@gmail.com','pswd5','2003-05-14','firstname5','lastname5'),
+ (6,'user6','user6@gmail.com','pswd6','2004-06-15','firstname6','lastname6'),
+ (7,'user7','user7@gmail.com','pswd7','2005-07-16','firstname7','lastname7'),
+ (8,'user8','user8@gmail.com','pswd8','2006-08-17','firstname8','lastname8'),
+ (9,'user9','user9@gmail.com','pswd9','2007-09-18','firstname9','lastname9'),
+ (10,'user10','user10@gmail.com','pswd10','2008-10-19','firstname10','lastname10');
 /*!40000 ALTER TABLE `custinfo` ENABLE KEYS */;
 
 
