@@ -1,0 +1,11 @@
+URL | METHOD | DESCRIPTION
+
+/      | get | show form
+/login | post | validate and redirect to /categories
+/register | get | show form
+/register | post | add user and redirect to /categories
+/categories | get | show category list and send to /booking
+/booking | get | show booking form
+/booking | post | added booking for car and send to /bookingdetails
+/bookingdetails | get | show user info and booked car info
+/logout | get | end session
